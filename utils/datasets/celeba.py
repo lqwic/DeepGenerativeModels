@@ -15,7 +15,9 @@ CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ## Create a custom Dataset class
 class CelebADataset(Dataset):
-    def __init__(self, root_dir=os.path.join(CUR_DIR, '../../data/celeba'), transform=None):
+    def __init__(self, root_dir=os.path.join(CUR_DIR, '../../data/celeba'), 
+                 selected_attrs = ['Black_Hair', 'Blond_Hair', 'Brown_Hair', 'Male', 'Young'], 
+                 transform=None):
         """
         Args:
           root_dir (string): Directory with all the images
@@ -30,7 +32,7 @@ class CelebADataset(Dataset):
         self.dataset_folder = os.path.abspath(dataset_folder)
         if not os.path.isdir(dataset_folder):
             # URL for the CelebA dataset
-            download_url = 'https://drive.google.com/uc?id=0B7EVK8r0v71pZjFTYXZWM3FlRnM'
+            download_url = 'https://drive.google.com/uc?id=1oVwvQn5ho5jEDCzIlNPBu411GwEw80iA'
             # Path to download the dataset to
             download_path = f'{root_dir}/img_align_celeba.zip'
             # Download the dataset from google drive
@@ -54,13 +56,14 @@ class CelebADataset(Dataset):
                 line = re.sub(' *\n', '', line)
                 if i == 0:
                     self.header = re.split(' +', line)
+                    selected_attr_indices = [self.header.index(attr) for attr in selected_attrs]
                 else:
                     values = re.split(' +', line)
                     filename = values[0]
                     self.filenames.append(filename)
-                    self.annotations.append([int(v) for v in values[1:]])
-                    
-        self.annotations = np.array(self.annotations)    
+                    selected_annotations = [int(values[idx]) for idx in selected_attr_indices]
+                    self.annotations.append(selected_annotations)  
+        self.annotations = np.array(self.annotations) 
               
     def __len__(self): 
         return len(self.filenames)
