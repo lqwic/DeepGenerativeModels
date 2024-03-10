@@ -61,7 +61,7 @@ class CelebADataset(Dataset):
                     values = re.split(' +', line)
                     filename = values[0]
                     self.filenames.append(filename)
-                    selected_annotations = [int(values[idx]) for idx in selected_attr_indices]
+                    selected_annotations = [int(values[idx + 1]) for idx in selected_attr_indices]
                     self.annotations.append(selected_annotations)  
         self.annotations = np.array(self.annotations) 
               
