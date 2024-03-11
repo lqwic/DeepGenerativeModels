@@ -62,10 +62,10 @@ class CelebADataset(Dataset):
                 values = re.split(r'\s+', line.strip())
                 filename = values[0]
                 self.filenames.append(filename)
-                selected_annotations = [int(values[idx + 1]) for idx in selected_attr_indices]
+                selected_annotations = [int(int(values[idx + 1]) == 1) for idx in selected_attr_indices]
 
-                female_annotation = 1 if selected_annotations[selected_attr_indices.index(male_index)] == -1 else -1
-                old_annotation = 1 if selected_annotations[selected_attr_indices.index(young_index)] == -1 else -1
+                female_annotation = 1 if selected_annotations[selected_attr_indices.index(male_index)] == 0 else 0
+                old_annotation = 1 if selected_annotations[selected_attr_indices.index(young_index)] == 0 else 0
 
                 selected_annotations.extend([female_annotation, old_annotation])
                 self.annotations.append(selected_annotations)
