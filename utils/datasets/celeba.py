@@ -52,17 +52,24 @@ class CelebADataset(Dataset):
         self.filenames = []
         self.annotations = []
         with open(f'{root_dir}/list_attr_celeba.txt') as f:
-            for i, line in enumerate(f.readlines()):
-                line = re.sub(' *\n', '', line)
-                if i == 0:
-                    self.header = re.split(' +', line)
-                    selected_attr_indices = [self.header.index(attr) for attr in selected_attrs]
-                else:
-                    values = re.split(' +', line)
-                    filename = values[0]
-                    self.filenames.append(filename)
-                    selected_annotations = [int(values[idx + 1]) for idx in selected_attr_indices]
-                    self.annotations.append(selected_annotations)  
+            lines = f.readlines()
+            self.header = re.split(r'\s+', lines[1].strip())
+            selected_attr_indices = [self.header.index(attr) for attr in selected_attrs]
+            male_index = self.header.index('Male')
+            young_index = self.header.index('Young')
+
+            for line in lines[2:]:
+                values = re.split(r'\s+', line.strip())
+                filename = values[0]
+                self.filenames.append(filename)
+                selected_annotations = [int(values[idx + 1]) for idx in selected_attr_indices]
+
+                female_annotation = 1 if selected_annotations[selected_attr_indices.index(male_index)] == -1 else -1
+                old_annotation = 1 if selected_annotations[selected_attr_indices.index(young_index)] == -1 else -1
+
+                selected_annotations.extend([female_annotation, old_annotation])
+                self.annotations.append(selected_annotations)
+
         self.annotations = np.array(self.annotations) 
               
     def __len__(self): 
