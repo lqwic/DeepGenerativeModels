@@ -53,12 +53,12 @@ class CelebADataset(Dataset):
         self.annotations = []
         with open(f'{root_dir}/list_attr_celeba.txt') as f:
             lines = f.readlines()
-            self.header = re.split(r'\s+', lines[1].strip())
+            self.header = re.split(r'\s+', lines[0].strip())
             selected_attr_indices = [self.header.index(attr) for attr in selected_attrs]
             male_index = self.header.index('Male')
             young_index = self.header.index('Young')
 
-            for line in lines[2:]:
+            for line in lines[1:]:
                 values = re.split(r'\s+', line.strip())
                 filename = values[0]
                 self.filenames.append(filename)
