@@ -15,9 +15,7 @@ CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ## Create a custom Dataset class
 class CelebADataset(Dataset):
-    def __init__(self, root_dir=os.path.join(CUR_DIR, '../../data/celeba'), 
-                 selected_attrs = ['Black_Hair', 'Blond_Hair', 'Brown_Hair', 'Male', 'Young'], 
-                 transform=None):
+    def __init__(self, root_dir=os.path.join(CUR_DIR, '../../data/celeba'), transform=None):
         """
         Args:
           root_dir (string): Directory with all the images
@@ -52,25 +50,17 @@ class CelebADataset(Dataset):
         self.filenames = []
         self.annotations = []
         with open(f'{root_dir}/list_attr_celeba.txt') as f:
-            lines = f.readlines()
-            self.header = re.split(r'\s+', lines[0].strip())
-            selected_attr_indices = [self.header.index(attr) for attr in selected_attrs]
-            male_index = self.header.index('Male')
-            young_index = self.header.index('Young')
-
-            for line in lines[1:]:
-                values = re.split(r'\s+', line.strip())
-                filename = values[0]
-                self.filenames.append(filename)
-                selected_annotations = [int(int(values[idx + 1]) == 1) for idx in selected_attr_indices]
-
-                female_annotation = 1 if selected_annotations[selected_attr_indices.index(male_index)] == 0 else 0
-                old_annotation = 1 if selected_annotations[selected_attr_indices.index(young_index)] == 0 else 0
-
-                selected_annotations.extend([female_annotation, old_annotation])
-                self.annotations.append(selected_annotations)
-
-        self.annotations = np.array(self.annotations) 
+            for i, line in enumerate(f.readlines()):
+                line = re.sub(' *\n', '', line)
+                if i == 0:
+                    self.header = re.split(' +', line)
+                else:
+                    values = re.split(' +', line)
+                    filename = values[0]
+                    self.filenames.append(filename)
+                    self.annotations.append([int(v) for v in values[1:]])
+                    
+        self.annotations = np.array(self.annotations)    
               
     def __len__(self): 
         return len(self.filenames)
